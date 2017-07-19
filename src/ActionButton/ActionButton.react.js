@@ -211,6 +211,7 @@ class ActionButton extends PureComponent {
                 this.setState({ render: transition });
             }
         } else {
+            this.props.onPress('hide-button');
             this.setState({ render: 'button' });
         }
     }
