@@ -31,6 +31,7 @@ const propTypes = {
             name: PropTypes.string,
         })),
     ]),
+    rootState: PropTypes.bool,
     /**
     * Called when button is pressed. Text is passed as param
     */
@@ -63,6 +64,7 @@ const propTypes = {
 const defaultProps = {
     icon: 'add',
     style: {},
+    rootState: false,
     hidden: false,
 };
 const contextTypes = {
@@ -186,9 +188,9 @@ class ActionButton extends PureComponent {
         }
     }
     onPress = (action) => {
-        const { onPress } = this.props;
-
-        this.toggleState();
+        const { onPress, rootState } = this.props;
+        if(!rootState)
+          this.toggleState();
 
         if (onPress) {
             onPress(action);
@@ -211,7 +213,7 @@ class ActionButton extends PureComponent {
                 this.setState({ render: transition });
             }
         } else {
-            this.props.onPress('hide-button');
+            this.props.onPress('hide-button')
             this.setState({ render: 'button' });
         }
     }
