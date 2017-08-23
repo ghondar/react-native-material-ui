@@ -17,10 +17,12 @@ const propTypes = {
         active: PropTypes.bool,
         disabled: PropTypes.bool,
     })),
+    payload: PropTypes.object,
     divider: PropTypes.bool,
 };
 const defaultProps = {
     style: {},
+    payload: {}
 };
 const contextTypes = {
     uiTheme: PropTypes.object.isRequired,
@@ -57,6 +59,26 @@ function getStyles(props, context) {
     };
 }
 
+class Item extends PureComponent {
+  onPress = () => {
+    const { payload } = this.props
+    this.props.onPress(payload)
+  }
+  render() {
+    const {icon, value, style } = this.props
+
+    return (
+      <ListItem
+          dense
+          leftElement={icon}
+          centerElement={value}
+          onPress={this.onPress}
+          style={style}
+      />
+    )
+  }
+}
+
 class Section extends PureComponent {
     renderTitle = () => {
         const { title } = this.props;
@@ -67,9 +89,24 @@ class Section extends PureComponent {
 
         return <Subheader text={title} />;
     }
+    renderItem = (item, i) => {
+      const { typography } = this.context.uiTheme;
+      let style = { primaryText: typography.buttons };
+
+      if (item.active) {
+          style = this.context.uiTheme.drawerSectionActiveItem;
+      }
+
+      return (
+          <Item
+              key={`${i}-${item.icon}`}
+              {...item}
+              style={style}
+          />
+      );
+    }
     render() {
         const { items, divider } = this.props;
-        const { typography } = this.context.uiTheme;
 
         const styles = getStyles(this.props, this.context);
 
@@ -77,24 +114,7 @@ class Section extends PureComponent {
             <View>
                 <View style={styles.container}>
                     {this.renderTitle(styles)}
-                    {items && items.map((item, i) => {
-                        let style = { primaryText: typography.buttons };
-
-                        if (item.active) {
-                            style = this.context.uiTheme.drawerSectionActiveItem;
-                        }
-
-                        return (
-                            <ListItem
-                                dense
-                                key={`${i}-${item.icon}`}
-                                leftElement={item.icon}
-                                centerElement={item.value}
-                                onPress={item.onPress}
-                                style={style}
-                            />
-                        );
-                    })}
+                    {items && items.map((item, i) => this.renderItem(item, i))}
                 </View>
                 {divider && <Divider />}
             </View>
